@@ -1,0 +1,43 @@
+print ("Tell me about your company! ")
+'''enter all percents as plain numbers, ex 36.1% or .361 should be entered as 36.1'''
+mv = input("Market Value: ")
+tr= input("Tax Rate: ")
+EBITDA= input("EBITDA: ")
+dep = input("Depriciation: ")
+rfree = input("Risk free rate: ")
+print("Sweet, now lets find your bond rating!")
+dc = input('debt to capital: ') 
+ # import the csv with the default spread info
+import pandas as pd
+df = pd.read_csv(r"C:\Users\megwh\Desktop\spreads.csv")
+a = df['spread']
+spread = a.tolist()
+b = df['rating']
+rating = b.tolist()
+''' helpful stuff on how to get into the data frame:
+print(df.head(14))
+print(df['minicov'][0])
+df.to_dict('index')
+'''
+
+def COD(dc):
+    EBIT = float(EBITDA) - float(dep)
+    DtE = dc/(1-dc)
+    Debt = (float(dc)/1)*float(mv)
+    n=0
+    for i in range(16):
+        irate = (rfree + spread[n])
+        if dc == 0:
+            return print ("Rating is: ", rating[0], ", Cost of Debt is:", 100*irate, "%")
+            break
+        coverage = EBIT/(irate*Debt)
+        if coverage >= df['minicov'][n]: 
+            return print ( "Rating is: ", rating[n], ", Cost of Debt is:", 100*irate, "%")
+            break
+        elif coverage < df['minicov'][n]:
+            n +=1
+dc = 0
+for i in range(10):
+    print (round(dc,1))
+    COD(dc)
+    dc= dc + .1
